@@ -8,6 +8,6 @@ extern crate sha2;
 
 pub mod electrumx_client;
 pub mod interface;
-mod raw_response;
-mod response;
+pub mod raw_response;
+pub mod response;
 pub mod tools;

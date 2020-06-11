@@ -242,9 +242,9 @@ fn main() {
 
     if let Some(matches) = matches.subcommand_matches("gettx") {
         let tx_hash = matches.value_of("tx_hash").unwrap();
-        let verbose = matches.is_present("verbose");
+        // let verbose = matches.is_present("verbose");
         let merkle = matches.is_present("merkle");
-        let tx = client.get_transaction(tx_hash.to_string(), verbose, merkle).unwrap();
+        let tx = client.get_transaction(tx_hash.to_string(), merkle).unwrap();
         println!("{}", &tx);
     }
 

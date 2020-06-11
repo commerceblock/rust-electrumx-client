@@ -8,9 +8,11 @@ use std::{
 
 use interface::Electrumx;
 use raw_response::{GetBlockHeaderRawResponse, GetBlockHeadersRawResponse, EstimateFeeRawResponse,
-                   RelayFeeRawResponse, GetBalanceRawResponse, GetHistoryRawResponse,
-                   GetListUnspentRawResponse, BroadcastTransactionRawResponse, GetTransactionRawResponse};
-use response::{GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse};
+   RelayFeeRawResponse, GetBalanceRawResponse, GetHistoryRawResponse,
+   GetListUnspentRawResponse, BroadcastTransactionRawResponse, GetTransactionRawResponse,
+   GetTransactionConfStatusRawResponse};
+use response::{GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse,
+    GetTransactionConfStatus};
 use tools;
 
 pub struct ElectrumxClient<A: ToSocketAddrs> {
@@ -20,7 +22,7 @@ pub struct ElectrumxClient<A: ToSocketAddrs> {
 }
 
 impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
-    fn get_block_header(&mut self, height: usize) -> Result<String, Box<Error>> {
+    fn get_block_header(&mut self, height: usize) -> Result<String, Box<dyn Error>> {
         let req = Request::new(0, "blockchain.block.header", vec![Param::Usize(height)]);
         self.call(req)?;
         let raw = self.recv()?;
@@ -28,7 +30,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(resp.result)
     }
 
-    fn get_block_headers(&mut self, start_height: usize, count: usize) -> Result<GetBlockHeadersResponse, Box<Error>> {
+    fn get_block_headers(&mut self, start_height: usize, count: usize) -> Result<GetBlockHeadersResponse, Box<dyn Error>> {
         let params = vec![
             Param::Usize(start_height),
             Param::Usize(count),
@@ -40,7 +42,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(resp.result)
     }
 
-    fn estimate_fee(&mut self, number: usize) -> Result<f64, Box<Error>> {
+    fn estimate_fee(&mut self, number: usize) -> Result<f64, Box<dyn Error>> {
         let req = Request::new(0, "blockchain.estimatefee", vec![Param::Usize(number)]);
         self.call(req)?;
         let raw = self.recv()?;
@@ -48,7 +50,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(resp.result)
     }
 
-    fn relay_fee(&mut self) -> Result<f64, Box<Error>> {
+    fn relay_fee(&mut self) -> Result<f64, Box<dyn Error>> {
         let req = Request::new(0, "blockchain.relayfee", Vec::new());
         self.call(req)?;
         let raw = self.recv()?;
@@ -56,7 +58,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(resp.result)
     }
 
-    fn get_balance(&mut self, addr: &str) -> Result<GetBalanceResponse, Box<Error>> {
+    fn get_balance(&mut self, addr: &str) -> Result<GetBalanceResponse, Box<dyn Error>> {
         let reversed = tools::decode_address_helper(addr);
         let params = vec![Param::String(reversed)];
         let req = Request::new(0, "blockchain.scripthash.get_balance", params);
@@ -66,7 +68,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(resp.result)
     }
 
-    fn get_history(&mut self, addr: &str) -> Result<Vec<GetHistoryResponse>, Box<Error>> {
+    fn get_history(&mut self, addr: &str) -> Result<Vec<GetHistoryResponse>, Box<dyn Error>> {
         let reversed = tools::decode_address_helper(&addr);
         let params = vec![Param::String(reversed)];
         let req = Request::new(0, "blockchain.scripthash.get_history", params);
@@ -77,7 +79,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
     }
 
     // TODO(evg): DOES NOT SUPPORT ??
-    fn get_mempool(&mut self, addr: &str) -> Result<Vec<u8>, Box<Error>> {
+    fn get_mempool(&mut self, addr: &str) -> Result<Vec<u8>, Box<dyn Error>> {
         let reversed = tools::decode_address_helper(&addr);
         let params = vec![Param::String(reversed)];
         let req = Request::new(0, "blockchain.scripthash.get_mempool", params);
@@ -87,7 +89,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
     }
 
     // TODO(evg): DOES NOT SUPPORT ??
-    fn history(&mut self, addr: &str) -> Result<Vec<u8>, Box<Error>> {
+    fn history(&mut self, addr: &str) -> Result<Vec<u8>, Box<dyn Error>> {
         let reversed = tools::decode_address_helper(&addr);
         let params = vec![Param::String(reversed)];
         let req = Request::new(0, "blockchain.scripthash.history", params);
@@ -96,7 +98,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(raw)
     }
 
-    fn get_list_unspent(&mut self, addr: &str) -> Result<Vec<GetListUnspentResponse>, Box<Error>> {
+    fn get_list_unspent(&mut self, addr: &str) -> Result<Vec<GetListUnspentResponse>, Box<dyn Error>> {
         let reversed = tools::decode_address_helper(&addr);
         let params = vec![Param::String(reversed)];
         let req = Request::new(0, "blockchain.scripthash.listunspent", params);
@@ -107,7 +109,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
     }
 
     // TODO(evg): DOES NOT SUPPORT ??
-    fn get_utxos(&mut self, addr: &str) -> Result<Vec<u8>, Box<Error>> {
+    fn get_utxos(&mut self, addr: &str) -> Result<Vec<u8>, Box<dyn Error>> {
         let reversed = tools::decode_address_helper(&addr);
         let params = vec![Param::String(reversed)];
         let req = Request::new(0, "blockchain.scripthash.utxos", params);
@@ -116,7 +118,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(raw)
     }
 
-    fn broadcast_transaction(&mut self, raw_tx: String) -> Result<String, Box<Error>> {
+    fn broadcast_transaction(&mut self, raw_tx: String) -> Result<String, Box<dyn Error>> {
         let params = vec![Param::String(raw_tx)];
         let req = Request::new(0, "blockchain.transaction.broadcast", params);
         self.call(req)?;
@@ -125,21 +127,36 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(resp.result)
     }
 
-    fn get_transaction(&mut self, tx_hash: String, verbose: bool, merkle: bool) -> Result<String, Box<Error>> {
+    fn get_transaction(&mut self, tx_hash: String, merkle: bool) -> Result<String, Box<dyn Error>> {
         let params = vec![
             Param::String(tx_hash),
-            Param::Bool(verbose),
+            Param::Bool(false), // verbose transaction not yet implemented
             Param::Bool(merkle),
         ];
         let req = Request::new(0, "blockchain.transaction.get", params);
         self.call(req)?;
         let raw = self.recv()?;
         let resp: GetTransactionRawResponse = serde_json::from_slice(&raw)?;
+
+        Ok(resp.result)
+    }
+
+    fn get_transaction_conf_status(&mut self, tx_hash: String, merkle: bool) -> Result<GetTransactionConfStatus, Box<dyn Error>> {
+        let params = vec![
+            Param::String(tx_hash),
+            Param::Bool(true),
+            Param::Bool(merkle),
+        ];
+        let req = Request::new(0, "blockchain.transaction.get", params);
+        self.call(req)?;
+        let raw = self.recv()?;
+        let resp: GetTransactionConfStatusRawResponse = serde_json::from_slice(&raw)?;
+
         Ok(resp.result)
     }
 
     // TODO(evg): DOES IT WORK ??
-    fn get_merkle_transaction(&mut self, tx_hash: String, height: usize) -> Result<Vec<u8>, Box<Error>> {
+    fn get_merkle_transaction(&mut self, tx_hash: String, height: usize) -> Result<Vec<u8>, Box<dyn Error>> {
         let params = vec![
             Param::String(tx_hash),
             Param::Usize(height),
@@ -151,7 +168,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
     }
 
     // TODO(evg): DOES NOT SUPPORT ??
-    fn transaction_id_from_pos(&mut self, height: usize, tx_pos: usize, merkle: bool) -> Result<Vec<u8>, Box<Error>> {
+    fn transaction_id_from_pos(&mut self, height: usize, tx_pos: usize, merkle: bool) -> Result<Vec<u8>, Box<dyn Error>> {
         let params = vec![
             Param::Usize(height),
             Param::Usize(tx_pos),
@@ -163,7 +180,7 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         Ok(raw)
     }
 
-    fn get_fee_histogram_mempool(&mut self) -> Result<Vec<u8>, Box<Error>> {
+    fn get_fee_histogram_mempool(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
         let req = Request::new(0, "mempool.get_fee_histogram", vec![]);
         self.call(req)?;
         let raw = self.recv()?;
@@ -180,7 +197,7 @@ impl<A: ToSocketAddrs + Clone> ElectrumxClient<A> {
         })
     }
 
-    fn call(&mut self, req: Request) -> Result<(), Box<Error>> {
+    fn call(&mut self, req: Request) -> Result<(), Box<dyn Error>> {
         let raw = serde_json::to_vec(&req)?;
         self.stream.write_all(&raw)?;
         self.stream.write_all(&[10])?;

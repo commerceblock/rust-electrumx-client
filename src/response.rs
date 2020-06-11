@@ -24,3 +24,10 @@ pub struct GetListUnspentResponse {
     pub tx_pos:  usize,
     pub value:   usize,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct GetTransactionConfStatus {
+    pub in_active_chain: Option<bool>,
+    pub confirmations: Option<u32>,
+    pub blocktime: Option<usize>,
+}
