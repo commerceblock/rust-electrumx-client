@@ -47,6 +47,8 @@ fn main() {
         .subcommand(SubCommand::with_name("relayfee")
             .about("Return the minimum fee a low-priority transaction must pay in order to be \
             accepted to the daemon’s memory pool."))
+        .subcommand(SubCommand::with_name("gettipheader")
+            .about("Return the blockchain tip header and current block height."))
         .subcommand(SubCommand::with_name("toscripthash")
             .arg(Arg::with_name("addr")
                 .long("addr")
@@ -194,6 +196,11 @@ fn main() {
         let fee = client.relay_fee().unwrap();
         println!("{}", fee);
     }
+
+    if let Some(_matches) = matches.subcommand_matches("gettipheader") {
+        let resp = client.get_tip_header().unwrap();
+        println!("{:?}", resp);
+    }    
 
     if let Some(matches) = matches.subcommand_matches("getbalance") {
         let addr = matches.value_of("addr").unwrap();

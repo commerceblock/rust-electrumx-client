@@ -1,10 +1,17 @@
-use response::{GetTransactionConfStatus, GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse};
+use response::{GetTransactionConfStatus, GetTipResponse, GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse};
 
 #[derive(Debug, Deserialize)]
 pub struct GetBlockHeaderRawResponse {
     id:      usize,
     jsonrpc: String,
     pub result:  String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GetTipRawResponse {
+    id:      usize,
+    jsonrpc: String,
+    pub result:  GetTipResponse,
 }
 
 #[derive(Debug, Deserialize)]
