@@ -1,5 +1,5 @@
 use std::error::Error;
-use response::{GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse, GetTransactionConfStatus};
+use response::{GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse, GetTransactionConfStatus, GetTipResponse};
 
 pub trait Electrumx {
     // Return the block header at the given height.
@@ -52,4 +52,5 @@ pub trait Electrumx {
     fn get_merkle_transaction(&mut self, tx_hash: String, height: usize) -> Result<Vec<u8>, Box<dyn Error>>;
     fn transaction_id_from_pos(&mut self, height: usize, tx_pos: usize, merkle: bool) -> Result<Vec<u8>, Box<dyn Error>>;
     fn get_fee_histogram_mempool(&mut self) -> Result<Vec<u8>, Box<dyn Error>>;
+    fn get_tip_header(&mut self) -> Result<GetTipResponse, Box<dyn Error>>;
 }

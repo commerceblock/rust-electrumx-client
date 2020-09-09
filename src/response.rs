@@ -6,6 +6,12 @@ pub struct GetBlockHeadersResponse {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct GetTipResponse {
+    pub height: usize,
+    pub hex:   String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct GetBalanceResponse {
     pub confirmed:   u64,
     pub unconfirmed: u64,

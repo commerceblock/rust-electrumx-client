@@ -10,9 +10,9 @@ use interface::Electrumx;
 use raw_response::{GetBlockHeaderRawResponse, GetBlockHeadersRawResponse, EstimateFeeRawResponse,
    RelayFeeRawResponse, GetBalanceRawResponse, GetHistoryRawResponse,
    GetListUnspentRawResponse, BroadcastTransactionRawResponse, GetTransactionRawResponse,
-   GetTransactionConfStatusRawResponse};
+   GetTransactionConfStatusRawResponse, GetTipRawResponse};
 use response::{GetBlockHeadersResponse, GetBalanceResponse, GetHistoryResponse, GetListUnspentResponse,
-    GetTransactionConfStatus};
+    GetTransactionConfStatus, GetTipResponse};
 use tools;
 
 pub struct ElectrumxClient<A: ToSocketAddrs> {
@@ -29,6 +29,14 @@ impl<A: ToSocketAddrs + Clone> Electrumx for ElectrumxClient<A> {
         let resp: GetBlockHeaderRawResponse = serde_json::from_slice(&raw)?;
         Ok(resp.result)
     }
+
+    fn get_tip_header(&mut self) -> Result<GetTipResponse, Box<dyn Error>> {
+        let req = Request::new(0, "blockchain.headers.subscribe", Vec::new());
+        self.call(req)?;
+        let raw = self.recv()?;
+        let resp: GetTipRawResponse = serde_json::from_slice(&raw)?;
+        Ok(resp.result)
+    }    
 
     fn get_block_headers(&mut self, start_height: usize, count: usize) -> Result<GetBlockHeadersResponse, Box<dyn Error>> {
         let params = vec![
