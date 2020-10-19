@@ -11,7 +11,7 @@ pub struct GetTipResponse {
     pub hex:   String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GetBalanceResponse {
     pub confirmed:   u64,
     pub unconfirmed: u64,
