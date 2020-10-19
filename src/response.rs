@@ -23,7 +23,7 @@ pub struct GetHistoryResponse {
     pub tx_hash: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GetListUnspentResponse {
     pub height:  usize,
     pub tx_hash: String,
@@ -31,7 +31,7 @@ pub struct GetListUnspentResponse {
     pub value:   usize,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GetTransactionConfStatus {
     pub in_active_chain: Option<bool>,
     pub confirmations: Option<u32>,
